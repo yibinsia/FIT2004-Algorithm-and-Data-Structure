@@ -51,7 +51,7 @@ def function1(fitmons):
                     fused_cuteness = dp[i][k] + dp[k + 1][j]
                     dp[i][j] = max(dp[i][j], fused_cuteness)
 
-    # Return the maximum cuteness score for the entire array of fitmons
+    # Return the maximum cuteness score for the entire array of fitmons (top right)
     return dp[0][n - 1]
 
 def fuse(fitmons):
