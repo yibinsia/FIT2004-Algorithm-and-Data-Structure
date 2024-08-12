@@ -9,71 +9,71 @@ FIT2004 Assignment 1
 
 def function1(fitmons):
     """
-    This function recursively finding the optimal combination of fitmons to fuse together 
-    to get the highest cuteness score. 
-
-    Precondition: The fitmons have not been fused together.
-    Postcondition: The optimal combination of fitmons have been found.
+    This function finds the optimal combination of fitmons to fuse together 
+    to achieve the highest possible cuteness score using dynamic programming.
 
     Input:
-        fitmons: A list of fitmons, where each fitmon is represented by a list of 3 elements.
-        dp: A dictionary to store the memoization of the cuteness score of the fitmons.
+        fitmons: A list of fitmons, where each fitmon is represented by a list of 3 elements [ID, cuteness, affinity].
+
     Return:
-        dp: A dictionary containing the optimal combination of current stage of fitmons.
+        An integer representing the highest cuteness score that can be achieved by fusing the given fitmons.
+
     Time complexity: 
-        Best case analysis: O(N^2), where N is the number of fitmons. The function will go through all the fitmons and
-                            for each fitmon, it will depends on the value of left and right affinity to go through all 
-                            the other fitmons to find the optimal combination. Best case when the input list is length 2,
-                            return after 1 fuse.
-        Worst case analysis: O(N^2), where N is the number of fitmons. Same with best case, the function need to go through
-                            all the fitmons and for each fitmon, it will find the optimal combination.
+        Best case analysis: O(N^3), where N is the number of fitmons. The algorithm needs to check all pairs of fitmons
+                            within subarrays of varying lengths, considering all possible splits for fusion. In the best 
+                            case, there is a small number of fitmons, but the complexity remains O(N^3).
+        Worst case analysis: O(N^3), where N is the number of fitmons. In the worst case, the algorithm must consider 
+                            all possible ways to fuse the fitmons, leading to cubic complexity.
+
     Space complexity: 
-        Input space analysis: O(N), where N is the number of fitmons in the input list. 
-        Aux space analysis: O(N), N is the number of fitmons, the dp dictionary will store the optimal combination of each stage of fitmons.
+        Input space analysis: O(N), where N is the number of fitmons in the input list.
+        Aux space analysis: O(N^2), where N is the number of fitmons. This is due to the 2D dynamic programming table `dp`
+                            that stores the intermediate cuteness scores for all subarrays of fitmons.
     """
     n = len(fitmons)
     dp = [[0] * n for _ in range(n)]
     
-    # Base case
+    # Base case: single fitmon's cuteness score
     for i in range(n):
-        dp[i][i] = fitmons[i][1]  # cuteness score of single fitmon
+        dp[i][i] = fitmons[i][1]  # cuteness score of a single fitmon
 
+    # Consider subarrays of increasing length
     for length in range(2, n + 1):  # length of the subarray
         for i in range(n - length + 1):
             j = i + length - 1
             # Consider all possible fusions within this range
             for k in range(i, j):
                 # Fusion happens between fitmons[k] and fitmons[k + 1]
-                # Calculate affinity for fusion
+                # Calculate the minimum affinity for a valid fusion
                 fused_affinity = min(fitmons[k][2], fitmons[k + 1][2])
                 if fused_affinity > 0:
                     # Calculate cuteness for fusion
                     fused_cuteness = dp[i][k] + dp[k + 1][j]
                     dp[i][j] = max(dp[i][j], fused_cuteness)
 
+    # Return the maximum cuteness score for the entire array of fitmons
     return dp[0][n - 1]
 
 def fuse(fitmons):
-  """
-    This function call function1 to find the optimal combination of fitmons to fuse together
+    """
+    This function calls function1 to find the optimal combination of fitmons to fuse together
     and return the highest cuteness score.
 
-    Precondition: Same as function1
-    Postcondition: Same as function1
-
     Input:
-        fitmons: A list of fitmons, where each fitmon is represented by a list of 3 elements.
+        fitmons: A list of fitmons, where each fitmon is represented by a list of 3 elements [ID, cuteness, affinity].
+
     Return:
-        An integer representing the highest cuteness score.
+        An integer representing the highest cuteness score that can be achieved by fusing the given fitmons.
 
     Time complexity: 
-        Best case analysis: Same as function1, O(N^2), where N is the number of fitmons.
-        Worst case analysis: Same as function1, O(N^2), where N is the number of fitmons.
+        Best case analysis: O(N^3), where N is the number of fitmons. Same as function1.
+        Worst case analysis: O(N^3), where N is the number of fitmons. Same as function1.
+        
     Space complexity: 
         Input space analysis: O(N), where N is the number of fitmons in the input list.
-        Aux space analysis: O(N), same as function1
+        Aux space analysis: O(N^2), same as function1 due to the `dp` table.
     """
-  return function1(fitmons)
+    return function1(fitmons)
 
 
 # ==========
