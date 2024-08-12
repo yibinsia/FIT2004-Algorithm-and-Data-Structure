@@ -13,7 +13,7 @@ def function1(fitmons):
     to achieve the highest possible cuteness score using dynamic programming.
 
     Input:
-        fitmons: A list of fitmons, where each fitmon is represented by a list of 3 elements [ID, cuteness, affinity].
+        fitmons: A list of fitmons.
 
     Return:
         An integer representing the highest cuteness score that can be achieved by fusing the given fitmons.
@@ -27,32 +27,38 @@ def function1(fitmons):
 
     Space complexity: 
         Input space analysis: O(N), where N is the number of fitmons in the input list.
-        Aux space analysis: O(N^2), where N is the number of fitmons. This is due to the 2D dynamic programming table `dp`
+        Aux space analysis: O(N^2), where N is the number of fitmons. This is due to the matrix 'dp'
                             that stores the intermediate cuteness scores for all subarrays of fitmons.
     """
-    n = len(fitmons)
-    dp = [[0] * n for _ in range(n)]
+    N = len(fitmons)
+    # dp[i][j] will store the maximum cuteness score we can achieve by fusing fitmons[i] to fitmons[j]
+    dp = [[0] * N for _ in range(N)]
     
-    # Base case: single fitmon's cuteness score
-    for i in range(n):
-        dp[i][i] = fitmons[i][1]  # cuteness score of a single fitmon
-
-    # Consider subarrays of increasing length
-    for length in range(2, n + 1):  # length of the subarray
-        for i in range(n - length + 1):
+    # To store the left and right affinities for dp[i][j] 
+    left_affinity = [[0] * N for _ in range(N)]
+    right_affinity = [[0] * N for _ in range(N)]
+    
+    # Base cases: when i == j (only one FITMON)
+    for i in range(N):
+        dp[i][i] = fitmons[i][1]  # Cuteness score
+        left_affinity[i][i] = fitmons[i][0]  # affinity_left
+        right_affinity[i][i] = fitmons[i][2]  # affinity_right
+    
+    # Filling all the superdiagonals of the dp table
+    for length in range(2, N + 1):  
+        for i in range(N - length + 1):
             j = i + length - 1
-            # Consider all possible fusions within this range
+            dp[i][j] = 0
             for k in range(i, j):
-                # Fusion happens between fitmons[k] and fitmons[k + 1]
-                # Calculate the minimum affinity for a valid fusion
-                fused_affinity = min(fitmons[k][2], fitmons[k + 1][2])
-                if fused_affinity > 0:
-                    # Calculate cuteness for fusion
-                    fused_cuteness = dp[i][k] + dp[k + 1][j]
-                    dp[i][j] = max(dp[i][j], fused_cuteness)
-
-    # Return the maximum cuteness score for the entire array of fitmons (top right)
-    return dp[0][n - 1]
+                current_cuteness = dp[i][k] * right_affinity[i][k] + dp[k+1][j] * left_affinity[k+1][j]
+                # Update dp[i][j] if we find a higher cuteness score
+                if current_cuteness > dp[i][j]:
+                    dp[i][j] = current_cuteness
+                    left_affinity[i][j] = left_affinity[i][k]
+                    right_affinity[i][j] = right_affinity[k+1][j]
+    
+    # top right corner of the dp table will store the highest cuteness score
+    return int(dp[0][N-1])
 
 def fuse(fitmons):
     """
@@ -60,7 +66,7 @@ def fuse(fitmons):
     and return the highest cuteness score.
 
     Input:
-        fitmons: A list of fitmons, where each fitmon is represented by a list of 3 elements [ID, cuteness, affinity].
+        fitmons: A list of fitmons.
 
     Return:
         An integer representing the highest cuteness score that can be achieved by fusing the given fitmons.
